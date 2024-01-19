@@ -1,7 +1,10 @@
-import express from "express";
+import express, { Request } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import got from "got";
+import { CandlestickGranularity, ICandles } from "./sharedTypes";
+import { CustomRequest } from "./types";
+import { assembleQueryString } from "./utils";
 
 dotenv.config();
 
@@ -16,12 +19,21 @@ app.use(
   })
 );
 
-let baseUrl: string, apiKey: string;
+let baseUrl: string, apiKey: string, accId: string;
 
 if (process.env.NODE_ENV === "DEMO") {
   baseUrl = process.env.BASE_URL_REST_DEMO!;
   apiKey = process.env.OANDA_API_KEY_DEMO!;
+  accId = process.env.OANDA_ACC_ID_1_DEMO!;
+} else {
+  apiKey = "";
 }
+
+const defaultOptions = {
+  headers: {
+    Authorization: `Bearer ${apiKey}`,
+  },
+};
 
 app.get("/accounts", async (req, res) => {
   try {
@@ -74,6 +86,29 @@ app.get("/accounts/:id/instruments", async (req, res) => {
       },
     });
     res.send(JSON.parse(response.body));
+  } catch (error) {
+    console.log({ error });
+  }
+});
+
+app.post("/candles", async (req: CustomRequest<ICandles>, res) => {
+  const { instrument, params } = req.body;
+  const queryString = assembleQueryString(params);
+
+  try {
+    const response = await got(
+      `${baseUrl}/v3/instruments/${instrument}/candles${queryString}`,
+      defaultOptions
+    );
+    const data = JSON.parse(response.body);
+    const candles = data.candles.map(({ time, mid }: any) => ({
+      o: Number(mid.o),
+      h: Number(mid.h),
+      l: Number(mid.l),
+      c: Number(mid.c),
+      time,
+    }));
+    res.send(candles);
   } catch (error) {
     console.log({ error });
   }

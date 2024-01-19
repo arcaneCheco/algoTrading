@@ -4,9 +4,10 @@
     "module": "commonjs",
     "outDir": "./dist",
     "esModuleInterop": true,
+    "allowJs": false,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true,
+    "skipLibCheck": true
   },
   "include": ["**/*"],
   "exclude": ["./dist"]
