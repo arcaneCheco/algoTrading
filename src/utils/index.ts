@@ -1,4 +1,6 @@
-export const assembleQueryString = (queryParams: { [key: string]: any }) => {
+export const assembleQueryString = (queryParams?: { [key: string]: any }) => {
+  if (!queryParams) return "";
+
   let isFirst = true;
   return Object.entries(queryParams).reduce((acc, [key, value]) => {
     let delimiter = "";

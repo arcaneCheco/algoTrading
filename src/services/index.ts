@@ -1,4 +1,4 @@
-import { ICandles } from "../../sharedTypes";
+import { ICandles, IGetOrders, IGetTrades, IId } from "../../sharedTypes";
 import { assembleQueryString } from "../utils";
 import dotenv from "dotenv";
 import got from "got";
@@ -9,15 +9,15 @@ dotenv.config({
 });
 const baseUrl = process.env.BASE_URL_REST;
 const apiKey = process.env.OANDA_API_KEY;
-const accId = process.env.OANDA_ACC_ID_1;
 
 const defaultOptions = {
   headers: {
     Authorization: `Bearer ${apiKey}`,
+    "Content-Type": "application/json",
   },
 };
 
-export const postCandles = async ({ instrument, params }: ICandles) => {
+export const getCandles = async ({ instrument, params }: ICandles) => {
   const queryString = assembleQueryString(params);
   const url = `${baseUrl}/v3/instruments/${instrument}/candles${queryString}`;
   const response = await got(url, defaultOptions);
@@ -32,47 +32,55 @@ export const postCandles = async ({ instrument, params }: ICandles) => {
   return candles;
 };
 
-// app.get("/accounts", async (req, res) => {
-//   try {
-//     const response = await got(`${baseUrl}/v3/accounts`, {
-//       headers: {
-//         Authorization: `Bearer ${apiKey}`,
-//       },
-//     });
-//     const accounts = JSON.parse(response.body).accounts;
-//     res.send(accounts);
-//   } catch (error) {
-//     console.log({ error });
-//   }
-// });
+export const getOrders = async ({ id, params }: IGetOrders) => {
+  const queryString = assembleQueryString(params);
+  const url = `${baseUrl}/v3/accounts/${id}/orders${queryString}`;
+  const response = await got(url, defaultOptions);
 
-// app.get("/accounts/:id", async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     const response = await got(`${baseUrl}/v3/accounts/${id}`, {
-//       headers: {
-//         Authorization: `Bearer ${apiKey}`,
-//       },
-//     });
-//     res.send(JSON.parse(response.body));
-//   } catch (error) {
-//     console.log({ error });
-//   }
-// });
+  return JSON.parse(response.body);
+};
 
-// app.get("/accounts/:id/summary", async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     const response = await got(`${baseUrl}/v3/accounts/${id}/summary`, {
-//       headers: {
-//         Authorization: `Bearer ${apiKey}`,
-//       },
-//     });
-//     res.send(JSON.parse(response.body));
-//   } catch (error) {
-//     console.log({ error });
-//   }
-// });
+export const getPendingOrders = async ({ id }: IId) => {
+  const url = `${baseUrl}/v3/accounts/${id}/pendingOrders`;
+  const response = await got(url, defaultOptions);
+
+  return JSON.parse(response.body);
+};
+
+export const getTrades = async ({ id, params }: IGetTrades) => {
+  const queryString = assembleQueryString(params);
+  const url = `${baseUrl}/v3/accounts/${id}/trades${queryString}`;
+  const response = await got(url, defaultOptions);
+
+  return JSON.parse(response.body);
+};
+
+export const getOpenTrades = async ({ id }: IId) => {
+  const url = `${baseUrl}/v3/accounts/${id}/openTrades`;
+  const response = await got(url, defaultOptions);
+
+  return JSON.parse(response.body);
+};
+
+export const getAccounts = async () => {
+  const url = `${baseUrl}/v3/accounts`;
+  const response = await got(url, defaultOptions);
+  return JSON.parse(response.body);
+};
+
+export const getAccount = async ({ id }: IId) => {
+  const url = `${baseUrl}/v3/accounts/${id}`;
+  const response = await got(url, defaultOptions);
+
+  return JSON.parse(response.body);
+};
+
+export const getAccountSummary = async ({ id }: IId) => {
+  const url = `${baseUrl}/v3/accounts/${id}/summary`;
+  const response = await got(url, defaultOptions);
+
+  return JSON.parse(response.body);
+};
 
 // app.get("/accounts/:id/instruments", async (req, res, next) => {
 //   const { id } = req.params;
@@ -80,6 +88,22 @@ export const postCandles = async ({ instrument, params }: ICandles) => {
 //     const response = await got(`${baseUrl}/v3/accounts/${id}/instruments`, {
 //       headers: {
 //         Authorization: `Bearer ${apiKey}`,
+//       },
+//     });
+//     res.send(JSON.parse(response.body));
+//   } catch (error) {
+//     console.log({ error });
+//     next(error);
+//   }
+// });
+
+// app.get("/orders/:id", async (req, res, next) => {
+//   const { id } = req.params;
+//   try {
+//     const response = await got(`${baseUrl}/v3/accounts/${id}/orders`, {
+//       headers: {
+//         Authorization: `Bearer ${apiKey}`,
+//         "Content-Type": "application/json",
 //       },
 //     });
 //     res.send(JSON.parse(response.body));
@@ -118,22 +142,6 @@ export const postCandles = async ({ instrument, params }: ICandles) => {
 //   }
 // });
 
-// app.get("/orders/:id", async (req, res, next) => {
-//   const { id } = req.params;
-//   try {
-//     const response = await got(`${baseUrl}/v3/accounts/${id}/orders`, {
-//       headers: {
-//         Authorization: `Bearer ${apiKey}`,
-//         "Content-Type": "application/json",
-//       },
-//     });
-//     res.send(JSON.parse(response.body));
-//   } catch (error) {
-//     console.log({ error });
-//     next(error);
-//   }
-// });
-
 // app.post("/orders", async (req, res, next) => {
 //   const { id, type, instrument, timeInForce, units, positionFill } = req.body;
 //   try {
@@ -147,42 +155,6 @@ export const postCandles = async ({ instrument, params }: ICandles) => {
 //       },
 //       body: JSON.stringify(sendBody),
 //     });
-//     res.send(JSON.parse(response.body));
-//   } catch (error) {
-//     console.log({ error });
-//     next(error);
-//   }
-// });
-
-// app.get("/openTrades/:id", async (req, res, next) => {
-//   const { id } = req.params;
-//   try {
-//     const response = await got(`${baseUrl}/v3/accounts/${id}/openTrades`, {
-//       headers: {
-//         Authorization: `Bearer ${apiKey}`,
-//         "Content-Type": "application/json",
-//       },
-//     });
-//     res.send(JSON.parse(response.body));
-//   } catch (error) {
-//     console.log({ error });
-//     next(error);
-//   }
-// });
-
-// app.get("/trades/:id", async (req, res, next) => {
-//   const { id } = req.params;
-//   try {
-//     const response = await got(
-//       `${baseUrl}/v3/accounts/${id}/trades`,
-//       // `${baseUrl}/v3/accounts/${id}/trades?beforeID=1`,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${apiKey}`,
-//           "Content-Type": "application/json",
-//         },
-//       }
-//     );
 //     res.send(JSON.parse(response.body));
 //   } catch (error) {
 //     console.log({ error });
