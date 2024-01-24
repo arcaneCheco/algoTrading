@@ -68,3 +68,7 @@ export interface IGetTrades extends IId {
     beforeID?: string;
   };
 }
+
+export interface IGetInstruments extends IId {
+  instruments?: string;
+}

@@ -14,12 +14,6 @@ app.use(router);
 
 app.use(errorHandler);
 
-enum OrderType {
-  Market = "MARKET",
-  Limit = "LIMIT",
-  Stop = "STOP",
-}
-
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
