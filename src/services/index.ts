@@ -1,9 +1,13 @@
 import {
   ICandles,
+  ICloseOpenPosition,
   IGetInstruments,
+  IGetLatestCandles,
   IGetOrders,
+  IGetPricing,
   IGetTrades,
   IId,
+  IPostMarketOrder,
 } from "../../sharedTypes";
 import { assembleQueryString } from "../utils";
 import dotenv from "dotenv";
@@ -28,6 +32,7 @@ export const getCandles = async ({ instrument, params }: ICandles) => {
   const url = `${baseUrl}/v3/instruments/${instrument}/candles${queryString}`;
   const response = await got(url, defaultOptions);
   const data = JSON.parse(response.body);
+  // return data;
   const candles = data.candles.map(({ time, mid }: any) => ({
     o: Number(mid.o),
     h: Number(mid.h),
@@ -39,6 +44,20 @@ export const getCandles = async ({ instrument, params }: ICandles) => {
   return candles;
 };
 
+export const getLatestCandles = async ({ id, params }: IGetLatestCandles) => {
+  const queryString = assembleQueryString(params);
+  const url = `${baseUrl}/v3/accounts/${id}/candles/latest${queryString}`;
+  const response = await got(url, defaultOptions);
+  const data = JSON.parse(response.body);
+  return data;
+};
+
+/****
+ * 
+// TO-DO
+ * change get spreads and get candles to use combined pricingComponent, e.g. price=MB
+ * 
+ */
 export const getSpreads = async ({ instrument, params }: ICandles) => {
   // price query should not be part of schema for this endpoint
   const queryString = assembleQueryString(params);
@@ -136,22 +155,39 @@ export const getOpenPositions = async ({ id }: IId) => {
   return JSON.parse(response.body);
 };
 
-// app.post("/orders", async (req, res, next) => {
-//   const { id, type, instrument, timeInForce, units, positionFill } = req.body;
-//   try {
-//     const sendBody = {
-//       order: { type, instrument, timeInForce, units, positionFill },
-//     };
-//     const response = await got.post(`${baseUrl}/v3/accounts/${id}/orders`, {
-//       headers: {
-//         Authorization: `Bearer ${apiKey}`,
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify(sendBody),
-//     });
-//     res.send(JSON.parse(response.body));
-//   } catch (error) {
-//     console.log({ error });
-//     next(error);
-//   }
-// });
+export const getPricing = async ({ id, params }: IGetPricing) => {
+  const queryString = assembleQueryString(params);
+  const url = `${baseUrl}/v3/accounts/${id}/pricing${queryString}`;
+  const response = await got(url, defaultOptions);
+
+  return JSON.parse(response.body);
+};
+
+export const postMarketOrder = async ({ id, body }: IPostMarketOrder) => {
+  const url = `${baseUrl}/v3/accounts/${id}/orders`;
+  const response = await got.post(url, {
+    body: JSON.stringify({ order: body }),
+    ...defaultOptions,
+  });
+
+  const data = JSON.parse(response.body);
+
+  return data;
+};
+
+export const putCloseOpenPosition = async ({
+  id,
+  instrument,
+  body,
+}: ICloseOpenPosition) => {
+  console.log({ id, instrument, body });
+  const url = `${baseUrl}/v3/accounts/${id}/positions/${instrument}/close`;
+  const response = await got.put(url, {
+    body: JSON.stringify(body),
+    ...defaultOptions,
+  });
+  const data = JSON.parse(response.body);
+  console.log(data);
+
+  return data;
+};

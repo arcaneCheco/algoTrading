@@ -3,10 +3,14 @@ import { NextFunction, Request, Response } from "express";
 // import { ICandles } from "@lt_surge/algo-trading-shared-types";
 import {
   ICandles,
+  ICloseOpenPosition,
   IGetInstruments,
+  IGetLatestCandles,
   IGetOrders,
+  IGetPricing,
   IGetTrades,
   IId,
+  IPostMarketOrder,
 } from "../../sharedTypes";
 
 interface CustomRequest<T> extends Request {
@@ -28,6 +32,19 @@ type CntrlFn<Body = void> = (
 export const getCandles: CntrlFn<ICandles> = async (req, res, next) => {
   try {
     res.send(await MODELS.getCandles(req.body));
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const getLatestCandles: CntrlFn<IGetLatestCandles> = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    res.send(await MODELS.getLatestCandles(req.body));
   } catch (error) {
     console.error(error);
     next(error);
@@ -131,6 +148,41 @@ export const getPositions: CntrlFn<IId> = async (req, res, next) => {
 export const getOpenPositions: CntrlFn<IId> = async (req, res, next) => {
   try {
     res.send(await MODELS.getOpenPositions(req.body));
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const getPricing: CntrlFn<IGetPricing> = async (req, res, next) => {
+  try {
+    res.send(await MODELS.getPricing(req.body));
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const postMarketOrder: CntrlFn<IPostMarketOrder> = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    res.send(await MODELS.postMarketOrder(req.body));
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const putCloseOpenPosition: CntrlFn<ICloseOpenPosition> = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    res.send(await MODELS.putCloseOpenPosition(req.body));
   } catch (error) {
     console.error(error);
     next(error);

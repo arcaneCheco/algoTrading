@@ -4,6 +4,7 @@ import * as CONTROLLER from "@src/controllers";
 const router = express.Router();
 
 router.post("/getCandles", CONTROLLER.getCandles);
+router.post("/getLatestCandles", CONTROLLER.getLatestCandles);
 router.post("/getOrders", CONTROLLER.getOrders);
 router.post("/getPendingOrders", CONTROLLER.getPendingOrders);
 router.post("/getTrades", CONTROLLER.getTrades);
@@ -15,5 +16,8 @@ router.post("/getInstruments", CONTROLLER.getInstruments);
 router.post("/getSpreads", CONTROLLER.getSpreads);
 router.post("/getPositions", CONTROLLER.getPositions);
 router.post("/getOpenPositions", CONTROLLER.getOpenPositions);
+router.post("/getPricing", CONTROLLER.getPricing);
+router.post("/postMarketOrder", CONTROLLER.postMarketOrder);
+router.post("/putCloseOpenPosition", CONTROLLER.putCloseOpenPosition);
 
 export default router;
