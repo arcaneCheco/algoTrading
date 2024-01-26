@@ -35,11 +35,16 @@ export type TradeStateFilter =
   | "CLOSE_WHEN_TRADEABLE"
   | "ALL";
 
+export type PricingComponent = "B" | "M" | "A" | "BM" | "BA" | "MA" | "BMA";
+
 export interface ICandlesParams {
   from?: string;
   to?: string;
   granularity?: CandlestickGranularity;
+  count?: `${number}`;
+  price?: PricingComponent;
 }
+
 export interface ICandles {
   instrument: string;
   params: ICandlesParams;
@@ -47,6 +52,10 @@ export interface ICandles {
 
 export interface IId {
   id: string;
+}
+
+export interface IGetSinglePosition extends IId {
+  instrument: string;
 }
 
 export interface IGetLatestCandles extends IId {
@@ -147,7 +156,7 @@ export interface ITrailingStopLossDetails {
 export interface IMarketOrderRequest {
   type?: OrderType;
   instrument: string;
-  units: string;
+  units: `${number}`;
   timeInForce?: TimeInForce;
   priceBound?: string;
   positionFill?: OrderPositionFill;
@@ -174,5 +183,21 @@ export interface ICloseOpenPosition {
     longClientExtensions?: IClientExtensions;
     shortUnits: CloseoutUnits;
     shortClientExtensions?: IClientExtensions;
+  };
+}
+
+export interface IGetTransactionsPages extends IId {
+  params?: {
+    from?: string;
+    to?: string;
+    pageSize?: number;
+    type?: string;
+  };
+}
+
+export interface IGetTransactionsSinceID extends IId {
+  params: {
+    id: string;
+    type?: string;
   };
 }

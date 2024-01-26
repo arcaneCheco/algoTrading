@@ -5,7 +5,10 @@ import {
   IGetLatestCandles,
   IGetOrders,
   IGetPricing,
+  IGetSinglePosition,
   IGetTrades,
+  IGetTransactionsPages,
+  IGetTransactionsSinceID,
   IId,
   IPostMarketOrder,
 } from "../../sharedTypes";
@@ -32,7 +35,7 @@ export const getCandles = async ({ instrument, params }: ICandles) => {
   const url = `${baseUrl}/v3/instruments/${instrument}/candles${queryString}`;
   const response = await got(url, defaultOptions);
   const data = JSON.parse(response.body);
-  // return data;
+  return data;
   const candles = data.candles.map(({ time, mid }: any) => ({
     o: Number(mid.o),
     h: Number(mid.h),
@@ -155,6 +158,16 @@ export const getOpenPositions = async ({ id }: IId) => {
   return JSON.parse(response.body);
 };
 
+export const getSinglePosition = async ({
+  id,
+  instrument,
+}: IGetSinglePosition) => {
+  const url = `${baseUrl}/v3/accounts/${id}/positions/${instrument}`;
+  const response = await got(url, defaultOptions);
+
+  return JSON.parse(response.body);
+};
+
 export const getPricing = async ({ id, params }: IGetPricing) => {
   const queryString = assembleQueryString(params);
   const url = `${baseUrl}/v3/accounts/${id}/pricing${queryString}`;
@@ -188,6 +201,30 @@ export const putCloseOpenPosition = async ({
   });
   const data = JSON.parse(response.body);
   console.log(data);
+
+  return data;
+};
+
+export const getTransactionsPages = async ({
+  id,
+  params,
+}: IGetTransactionsPages) => {
+  const queryString = assembleQueryString(params);
+  const url = `${baseUrl}/v3/accounts/${id}/transactions${queryString}`;
+  const response = await got(url, defaultOptions);
+  const data = JSON.parse(response.body);
+
+  return data;
+};
+
+export const getTransactionsSinceID = async ({
+  id,
+  params,
+}: IGetTransactionsSinceID) => {
+  const queryString = assembleQueryString(params);
+  const url = `${baseUrl}/v3/accounts/${id}/transactions/sinceid${queryString}`;
+  const response = await got(url, defaultOptions);
+  const data = JSON.parse(response.body);
 
   return data;
 };

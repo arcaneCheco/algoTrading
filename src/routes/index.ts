@@ -16,8 +16,11 @@ router.post("/getInstruments", CONTROLLER.getInstruments);
 router.post("/getSpreads", CONTROLLER.getSpreads);
 router.post("/getPositions", CONTROLLER.getPositions);
 router.post("/getOpenPositions", CONTROLLER.getOpenPositions);
+router.post("/getSinglePosition", CONTROLLER.getSinglePosition);
 router.post("/getPricing", CONTROLLER.getPricing);
 router.post("/postMarketOrder", CONTROLLER.postMarketOrder);
 router.post("/putCloseOpenPosition", CONTROLLER.putCloseOpenPosition);
+router.post("/getTransactionsPages", CONTROLLER.getTransactionsPages);
+router.post("/getTransactionsSinceID", CONTROLLER.getTransactionsSinceID);
 
 export default router;

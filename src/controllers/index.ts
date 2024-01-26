@@ -8,7 +8,10 @@ import {
   IGetLatestCandles,
   IGetOrders,
   IGetPricing,
+  IGetSinglePosition,
   IGetTrades,
+  IGetTransactionsPages,
+  IGetTransactionsSinceID,
   IId,
   IPostMarketOrder,
 } from "../../sharedTypes";
@@ -154,6 +157,19 @@ export const getOpenPositions: CntrlFn<IId> = async (req, res, next) => {
   }
 };
 
+export const getSinglePosition: CntrlFn<IGetSinglePosition> = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    res.send(await MODELS.getSinglePosition(req.body));
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
 export const getPricing: CntrlFn<IGetPricing> = async (req, res, next) => {
   try {
     res.send(await MODELS.getPricing(req.body));
@@ -183,6 +199,32 @@ export const putCloseOpenPosition: CntrlFn<ICloseOpenPosition> = async (
 ) => {
   try {
     res.send(await MODELS.putCloseOpenPosition(req.body));
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const getTransactionsPages: CntrlFn<IGetTransactionsPages> = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    res.send(await MODELS.getTransactionsPages(req.body));
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
+
+export const getTransactionsSinceID: CntrlFn<IGetTransactionsSinceID> = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    res.send(await MODELS.getTransactionsSinceID(req.body));
   } catch (error) {
     console.error(error);
     next(error);
