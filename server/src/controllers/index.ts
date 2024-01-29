@@ -14,7 +14,7 @@ import {
   IGetTransactionsSinceID,
   IId,
   IPostMarketOrder,
-} from "../../sharedTypes";
+} from "@sharedTypes";
 
 interface CustomRequest<T> extends Request {
   body: T;

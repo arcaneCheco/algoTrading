@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import router from "@src/routes";
 import { errorHandler } from "@src/middleware";
+import { onTime } from "./script";
 
 const app = express();
 const port = 3000;

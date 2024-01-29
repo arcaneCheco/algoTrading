@@ -11,7 +11,7 @@ import {
   IGetTransactionsSinceID,
   IId,
   IPostMarketOrder,
-} from "../../sharedTypes";
+} from "@sharedTypes";
 import { assembleQueryString } from "../utils";
 import dotenv from "dotenv";
 import got from "got";
