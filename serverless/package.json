@@ -1,0 +1,21 @@
+{
+  "name": "serverless",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "update-lambda": "aws lambda update-function-code --function-name test_function --zip-file fileb://deploy.zip"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "got": "^14.1.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.132",
+    "@types/got": "^9.6.12",
+    "typescript": "^5.3.3"
+  }
+}
