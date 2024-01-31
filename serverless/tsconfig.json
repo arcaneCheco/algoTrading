@@ -6,6 +6,11 @@
     "target": "es2016",
     "module": "ES2022",
     "esModuleInterop": true,
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "paths": {
+      "@src/*": ["./src/*"],
+      "@sharedTypes": ["../sharedTypes/index.d.ts"],
+      "@server/*": ["../server/src/*"]
+    }
   }
 }

@@ -4,3 +4,4 @@ server/script.ts
 sharedTypes/test.ts
 serverless/deploy
 serverless/dist
+serverless/.env
