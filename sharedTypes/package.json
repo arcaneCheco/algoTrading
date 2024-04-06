@@ -1,6 +1,6 @@
 {
   "name": "@lt_surge/algo-trading-shared-types",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "",
   "main": "index.js",
   "scripts": {

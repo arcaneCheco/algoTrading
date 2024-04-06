@@ -5,3 +5,5 @@ sharedTypes/test.ts
 serverless/deploy
 serverless/dist
 serverless/.env
+serverless/deploy.zip
+ec2script/.env

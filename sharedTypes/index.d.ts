@@ -43,6 +43,7 @@ export interface ICandlesParams {
   granularity?: CandlestickGranularity;
   count?: `${number}`;
   price?: PricingComponent;
+  includeFirst?: boolean;
 }
 
 export interface ICandles {
@@ -117,8 +118,8 @@ export type OrderPositionFill =
 
 export interface IClientExtensions {
   id: string;
-  tag: string;
-  comment: string;
+  tag?: string;
+  comment?: string;
 }
 
 export type TimeInForcePendingOrder = Exclude<TimeInForce, "FOK" | "IOC">;
@@ -131,11 +132,11 @@ export interface ITakeProfitDetails {
 }
 
 export interface IStopLossDetails {
-  price: string;
-  distance: string;
-  timeInForce: TimeInForcePendingOrder;
-  gtdTime: string;
-  clientExtensions: IClientExtensions;
+  price?: string;
+  distance?: string;
+  timeInForce?: TimeInForcePendingOrder;
+  gtdTime?: string;
+  clientExtensions?: IClientExtensions;
 }
 
 export interface IGuaranteedStopLossDetails {

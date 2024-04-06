@@ -1,14 +1,11 @@
-import got from "got";
-import { Context, APIGatewayProxyResult, APIGatewayEvent } from "aws-lambda";
 import {
   ICandles,
   IGetLatestCandles,
   IGetSinglePosition,
   IPostMarketOrder,
 } from "@sharedTypes";
-import { assembleQueryString } from "@server/utils";
 import dotenv from "dotenv";
-import schedule from "node-schedule";
+import got from "got";
 
 dotenv.config();
 
@@ -21,21 +18,26 @@ const defaultOptions = {
 
 const baseUrl = process.env.BASE_URL_REST;
 
-const id = process.env.TEST_ACCOUNT_ID!;
-
-const getData = async ({ instrument, params }: ICandles) => {
-  const queryString = assembleQueryString(params);
-  const url = `${baseUrl}/v3/instruments/${instrument}/candles${queryString}`;
-  const response = await got(url, defaultOptions);
-  const data = JSON.parse(response.body);
-  return data;
-};
-
-const getTimeDifference = (date: string) => {
+export const getTimeDifference = (date: string) => {
   return (new Date().getTime() - new Date(date).getTime()) / 1000;
 };
 
-const getLatestCandle = async (
+export const assembleQueryString = (queryParams?: { [key: string]: any }) => {
+  if (!queryParams) return "";
+
+  let isFirst = true;
+  return Object.entries(queryParams).reduce((acc, [key, value]) => {
+    let delimiter = "";
+    if (isFirst) {
+      isFirst = false;
+    } else {
+      delimiter = "&";
+    }
+    return acc + delimiter + `${key}=${value}`;
+  }, "?");
+};
+
+export const getLatestCandle = async (
   { id, params }: IGetLatestCandles,
   latestCandle: any
 ): Promise<any> => {
@@ -55,7 +57,15 @@ const getLatestCandle = async (
   return latestCandle;
 };
 
-const smaFromCandles = (candles: Array<any>) => {
+export const getData = async ({ instrument, params }: ICandles) => {
+  const queryString = assembleQueryString(params);
+  const url = `${baseUrl}/v3/instruments/${instrument}/candles${queryString}`;
+  const response = await got(url, defaultOptions);
+  const data = JSON.parse(response.body);
+  return data;
+};
+
+export const smaFromCandles = (candles: Array<any>) => {
   const sma =
     candles.reduce((sum: number, { mid }: any) => sum + Number(mid.c), 0) /
     candles.length;
@@ -63,7 +73,10 @@ const smaFromCandles = (candles: Array<any>) => {
   return sma;
 };
 
-const getCurrentPosition = async ({ id, instrument }: IGetSinglePosition) => {
+export const getCurrentPosition = async ({
+  id,
+  instrument,
+}: IGetSinglePosition) => {
   const url = `${baseUrl}/v3/accounts/${id}/positions/${instrument}`;
   const response = await got(url, defaultOptions);
   const data = JSON.parse(response.body);
@@ -82,7 +95,7 @@ const getCurrentPosition = async ({ id, instrument }: IGetSinglePosition) => {
   return { longUnits, shortUnits, currentPosition };
 };
 
-const useStrategy = (candle: any, sma: number, position: any) => {
+export const useStrategy = (candle: any, sma: number, position: any) => {
   const { currentPosition, longUnits, shortUnits } = position;
   const { c, h, l } = candle.mid;
   const close = Number(c);
@@ -146,82 +159,3 @@ export const submitMarketOrder = async ({ id, body }: IPostMarketOrder) => {
 
   return data;
 };
-
-const onTime = async () => {
-  const smaPeriod = 40;
-  const granularity = "M1";
-  const instrument = "EUR_USD";
-
-  console.log("time at which function is called", new Date().toISOString());
-
-  const position = await getCurrentPosition({
-    id,
-    instrument,
-  });
-
-  const { candles } = await getData({
-    instrument,
-    params: { granularity, count: `${smaPeriod}`, price: "M" },
-  });
-
-  let latestCandle = candles.pop();
-
-  console.log("time at which data is queried", new Date().toISOString());
-
-  latestCandle = await getLatestCandle(
-    { id, params: { candleSpecifications: `${instrument}:${granularity}:M` } },
-    latestCandle
-  );
-
-  console.log(
-    "time at which data is received",
-    new Date().toISOString(),
-    latestCandle
-  );
-
-  candles.push(latestCandle);
-
-  const sma = smaFromCandles(candles);
-
-  const { signal, units } = useStrategy(latestCandle, sma, position);
-
-  if (signal === "HOLD") return "HOLDING";
-
-  //   const orderDetails = await submitMarketOrder({
-  //     id: id,
-  //     body: {
-  //       type: "MARKET",
-  //       instrument,
-  //       units: `${units}`,
-  //       timeInForce: "FOK",
-  //       positionFill: "DEFAULT",
-  //     },
-  //   });
-
-  //   return orderDetails;
-};
-
-const job = schedule.scheduleJob("0 * * * * *", async () => {
-  await onTime();
-});
-
-// const now = new Date();
-
-export const handler = async (
-  event: APIGatewayEvent,
-  context: Context
-): Promise<APIGatewayProxyResult> => {
-  console.log({ event, context });
-  //   const res = await got(
-  //     "https://pokeapi.co/api/v2/pokemon/ditto",
-  //     defaultOptions
-  //   );
-  //   return JSON.parse(res.body);
-
-  const t = await onTime();
-  console.log(t);
-  return t;
-  //   return await onTime();
-};
-
-// (async () => handler({ body: "hey" } as APIGatewayEvent, {} as Context))();

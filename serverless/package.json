@@ -2,11 +2,14 @@
   "name": "serverless",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "update-lambda": "aws lambda update-function-code --function-name test_function --zip-file fileb://deploy.zip"
+    "update-lambda": "aws lambda update-function-code --function-name test_function --zip-file fileb://deploy.zip",
+    "bundle": "npx esbuild . --bundle --platform=node --outfile=deploy/index.js",
+    "zip": "cd ./deploy && zip -r ../deploy.zip . && cd .. && rm -r ./deploy",
+    "zip-and-update": "npm run bundle && npm run zip && npm run update-lambda && rm ./deploy.zip",
+    "update-log-streams": "aws logs describe-log-streams --log-group-name /aws/lambda/test_function > log-streams.json",
+    "get-log-events": "aws logs get-log-events --log-group-name /aws/lambda/test_function --log-stream-name"
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +20,9 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.132",
     "@types/got": "^9.6.12",
+    "@types/node-schedule": "^2.1.6",
+    "esbuild": "^0.20.0",
+    "node-schedule": "^2.1.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   }
